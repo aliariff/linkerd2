@@ -34,7 +34,7 @@ COPY web/srv web/srv
 COPY controller controller
 COPY pkg pkg
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o web/web ./web
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm go build -o web/web ./web
 
 ## package it all up
 FROM docker.io/etni35/base:2019-02-19.01

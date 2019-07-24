@@ -4,7 +4,7 @@ WORKDIR /go/src/github.com/linkerd/linkerd2
 COPY pkg pkg
 COPY controller controller
 COPY cni-plugin cni-plugin
-RUN CGO_ENABLED=0 GOOS=linux go build -o /go/bin/linkerd-cni -v ./cni-plugin/
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm go build -o /go/bin/linkerd-cni -v ./cni-plugin/
 
 FROM docker.io/etni35/base:2019-02-19.01
 WORKDIR /linkerd
