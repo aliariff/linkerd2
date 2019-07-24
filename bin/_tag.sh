@@ -21,11 +21,12 @@ named_tag() {
 }
 
 head_root_tag() {
-    if clean_head ; then
-        clean_head_root_tag
-    else
-        echo "dev-$(git_sha_head)-$USER"
-    fi
+    echo "stable-2.4.0"
+    # if clean_head ; then
+    #     clean_head_root_tag
+    # else
+    #     echo "dev-$(git_sha_head)-$USER"
+    # fi
 }
 
 clean_head_root_tag() {
