@@ -1,4 +1,4 @@
-FROM gcr.io/linkerd-io/base:2019-02-19.01
+FROM docker.io/etni35/base:2019-02-19.01
 RUN apt-get update && apt-get install -y --no-install-recommends \
     tcpdump \
     iproute2 \
