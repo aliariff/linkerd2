@@ -25,7 +25,7 @@ archive="$builddir/$filename"
 
 if [ ! -f "$archive" ]; then
   mkdir -p "$builddir"
-  curl -vsL "$builddir" "https://build.l5d.io/linkerd2-proxy/$filename" > "$archive"
+  curl -vsL "$builddir" "https://storage.googleapis.com/linkerd2-proxy-artifacts/linkerd2-proxy/$filename" > "$archive"
 fi
 
 if [ -n "$latest_sha" ]; then
