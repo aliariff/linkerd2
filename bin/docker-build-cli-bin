@@ -19,7 +19,6 @@ validate_go_deps_tag $dockerfile
 
 (
     $bindir/docker-build-base
-
 ) >/dev/null
 
 tag="$(head_root_tag)"

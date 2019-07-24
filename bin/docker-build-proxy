@@ -19,7 +19,6 @@ validate_go_deps_tag $dockerfile
 
 (
     $bindir/docker-build-base
-
 ) >/dev/null
 
 # Default to a pinned commit SHA of the proxy.
