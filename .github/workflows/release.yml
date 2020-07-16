@@ -57,6 +57,36 @@ jobs:
         name: image-archives
         path: /home/runner/archives
   # todo: Keep in sync with `cloud_integration.yml`
+  docker_buildx:
+    name: Docker buildx multi-arch images
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Checkout code
+      # actions/checkout@v2
+      uses: actions/checkout@722adc6
+    - name: Setup SSH config for Packet
+      run: |
+        mkdir -p ~/.ssh/
+        touch ~/.ssh/id && chmod 600 ~/.ssh/id
+        echo "${{ secrets.DOCKER_SSH_CONFIG }}"  > ~/.ssh/config
+        echo "${{ secrets.DOCKER_PRIVATE_KEY }}" > ~/.ssh/id
+        echo "${{ secrets.DOCKER_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+        ssh linkerd-docker docker version
+    - name: Set up Docker Buildx
+      env:
+        DOCKER_HOST: ssh://linkerd-docker
+      # crazy-max/ghaction-docker-buildx@v3.2.0
+      uses: crazy-max/ghaction-docker-buildx@552c9de
+    - name: Build multi-arch docker images
+      env:
+        DOCKER_HOST: ssh://linkerd-docker
+        DOCKER_TRACE: 1
+        DOCKER_BUILDX: 1
+        DOCKER_PUSH_MULTIARCH: false
+      run: |
+        export PATH="`pwd`/bin:$PATH"
+        bin/docker-build
+  # todo: Keep in sync with `cloud_integration.yml`
   docker_push:
     name: Docker push
     runs-on: ubuntu-18.04
