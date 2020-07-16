@@ -31,6 +31,11 @@ docker_repo() {
         name="$DOCKER_REGISTRY/$name"
     fi
 
+    if [ $repo == "go-deps" ] || [ $repo == "base" ]; then
+        echo "gcr.io/linkerd-io/$repo"
+        exit 0
+    fi
+
     echo "$name"
 }
 
