@@ -10,7 +10,7 @@ COPY cni-plugin cni-plugin
 ARG TARGETARCH
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=$TARGETARCH go build -o /go/bin/linkerd-cni -v -mod=readonly ./cni-plugin/
 
-FROM --platform=$TARGETPLATFORM gcr.io/linkerd-io/base:2020-06-08.01
+FROM --platform=$TARGETPLATFORM debian:buster-20200514-slim
 WORKDIR /linkerd
 RUN curl -kL -o $(which jq) https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
 COPY --from=golang /go/bin/linkerd-cni /opt/cni/bin/
