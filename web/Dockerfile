@@ -1,5 +1,5 @@
 ## bundle web assets
-FROM node:14-buster as webpack-bundle
+FROM --platform=$BUILDPLATFORM node:14-buster as webpack-bundle
 RUN curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.21.1 --network-concurrency 1
 
 ENV PATH /root/.yarn/bin:$PATH
@@ -21,18 +21,18 @@ COPY web/app ./web/app
 RUN ./bin/web build
 
 ## compile go server
-FROM gcr.io/linkerd-io/go-deps:a525d867 as golang
+FROM --platform=$BUILDPLATFORM gcr.io/linkerd-io/go-deps:a525d867 as golang
 WORKDIR /linkerd-build
 RUN mkdir -p web
 COPY web/main.go web
 COPY web/srv web/srv
 COPY controller controller
 COPY pkg pkg
-
-RUN CGO_ENABLED=0 GOOS=linux go build -mod=readonly -o web/web -ldflags "-s -w" ./web
+ARG TARGETARCH
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=$TARGETARCH go build -mod=readonly -o web/web -ldflags "-s -w" ./web
 
 ## package it all up
-FROM debian:buster-20200514-slim
+FROM --platform=$TARGETPLATFORM debian:buster-20200514-slim
 WORKDIR /linkerd
 
 COPY LICENSE .

@@ -1,12 +1,13 @@
 ## compile cni-plugin utility
-FROM gcr.io/linkerd-io/go-deps:a525d867 as golang
+FROM --platform=$BUILDPLATFORM gcr.io/linkerd-io/go-deps:a525d867 as golang
 WORKDIR /linkerd-build
 COPY pkg pkg
 COPY controller controller
 COPY cni-plugin cni-plugin
-RUN CGO_ENABLED=0 GOOS=linux go build -o /go/bin/linkerd-cni -v -mod=readonly ./cni-plugin/
+ARG TARGETARCH
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=$TARGETARCH go build -o /go/bin/linkerd-cni -v -mod=readonly ./cni-plugin/
 
-FROM gcr.io/linkerd-io/base:2020-06-08.01
+FROM --platform=$TARGETPLATFORM gcr.io/linkerd-io/base:2020-06-08.01
 WORKDIR /linkerd
 RUN curl -kL -o $(which jq) https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
 COPY --from=golang /go/bin/linkerd-cni /opt/cni/bin/
