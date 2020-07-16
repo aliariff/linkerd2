@@ -1,3 +1,4 @@
+ARG TARGETPLATFORM=linux/amd64
 FROM --platform=$TARGETPLATFORM grafana/grafana:7.0.3
 
 COPY LICENSE                          /linkerd/LICENSE

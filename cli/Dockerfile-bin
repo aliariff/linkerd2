@@ -1,3 +1,5 @@
+ARG BUILDPLATFORM=linux/amd64
+
 ## compile binaries
 FROM --platform=$BUILDPLATFORM gcr.io/linkerd-io/go-deps:a525d867 as golang
 WORKDIR /linkerd-build

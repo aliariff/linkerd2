@@ -1,3 +1,6 @@
+ARG BUILDPLATFORM=linux/amd64
+ARG TARGETPLATFORM=linux/amd64
+
 ## compile cni-plugin utility
 FROM --platform=$BUILDPLATFORM gcr.io/linkerd-io/go-deps:a525d867 as golang
 WORKDIR /linkerd-build
