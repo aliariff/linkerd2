@@ -14,6 +14,15 @@ export DOCKER_REGISTRY=${DOCKER_REGISTRY:-gcr.io/linkerd-io}
 # When set, causes docker's build output to be emitted to stderr.
 export DOCKER_TRACE=${DOCKER_TRACE:-}
 
+# When set, it will build multi architectures docker images.
+export DOCKER_BUILDX=${DOCKER_BUILDX:-}
+
+# When set together with DOCKER_BUILDX, it will push the multi architecture images to the registry.
+export DOCKER_PUSH_MULTIARCH=${DOCKER_PUSH_MULTIARCH:-false}
+
+# Default supported docker image architectures
+export SUPPORTED_ARCHS=linux/amd64,linux/arm64,linux/arm/v7
+
 docker_repo() {
     repo=$1
 
@@ -42,12 +51,24 @@ docker_build() {
 
     rootdir=$( cd "$bindir"/.. && pwd )
 
-    log_debug "  :; docker build $rootdir -t $repo:$tag -f $file $*"
-    docker build "$rootdir" \
-        -t "$repo:$tag" \
-        -f "$file" \
-        "$@" \
-        > "$output"
+    if [ -n "$DOCKER_BUILDX" ]; then
+        log_debug "  :; docker buildx build $rootdir --platform $SUPPORTED_ARCHS --output type=image,push=$DOCKER_PUSH_MULTIARCH -t $repo:$tag -t $repo:main -f $file $*"
+        docker buildx build "$rootdir" \
+            --platform "$SUPPORTED_ARCHS" \
+            --output "type=image,push=$DOCKER_PUSH_MULTIARCH" \
+            -t "$repo:$tag" \
+            -t "$repo:main" \
+            -f "$file" \
+            "$@" \
+            > "$output"
+    else
+        log_debug "  :; docker build $rootdir -t $repo:$tag -f $file $*"
+        docker build "$rootdir" \
+            -t "$repo:$tag" \
+            -f "$file" \
+            "$@" \
+            > "$output"
+    fi
 
     echo "$repo:$tag"
 }

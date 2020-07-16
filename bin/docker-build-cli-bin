@@ -25,6 +25,11 @@ validate_go_deps_tag "$dockerfile"
 
 tag=$(head_root_tag)
 docker_build cli-bin "$tag" "$dockerfile" --build-arg LINKERD_VERSION="$tag"
+
+if [ -n "$DOCKER_BUILDX" ]; then
+    exit 0
+fi
+
 IMG=$(docker_repo cli-bin):$tag
 ID=$(docker create "$IMG")
 
