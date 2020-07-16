@@ -12,7 +12,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=$TARGETARCH go build -o /go/bin/linkerd-cni 
 
 FROM --platform=$TARGETPLATFORM debian:buster-20200514-slim
 WORKDIR /linkerd
-RUN curl -kL -o $(which jq) https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+RUN apt-get update && apt-get install -y jq
 COPY --from=golang /go/bin/linkerd-cni /opt/cni/bin/
 COPY LICENSE .
 COPY cni-plugin/deployment/scripts/install-cni.sh .
