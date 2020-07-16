@@ -1,3 +1,5 @@
+ARG BUILDPLATFORM=linux/amd64
+
 ## compile controller service
 FROM --platform=$BUILDPLATFORM gcr.io/linkerd-io/go-deps:a525d867 as golang
 WORKDIR /linkerd-build

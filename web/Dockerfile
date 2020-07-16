@@ -1,3 +1,6 @@
+ARG BUILDPLATFORM=linux/amd64
+ARG TARGETPLATFORM=linux/amd64
+
 ## bundle web assets
 FROM --platform=$BUILDPLATFORM node:14-buster as webpack-bundle
 RUN curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.21.1 --network-concurrency 1
