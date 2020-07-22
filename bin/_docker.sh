@@ -72,8 +72,8 @@ docker_build() {
 
         log_debug "  :; docker buildx $rootdir $cache_params $output_params -t $repo:$tag -f $file $*"
         # shellcheck disable=SC2086
-        docker buildx build "$rootdir" "$cache_params" \
-            "$output_params" \
+        docker buildx build "$rootdir" $cache_params \
+            $output_params \
             -t "$repo:$tag" \
             -t "$repo:main" \
             -f "$file" \
