@@ -33,6 +33,7 @@ copy_binary() {
 }
 
 for arch in amd64 arm64 arm ; do
+  # pull specific image architecture
   pull=$(docker pull --platform $arch "$(docker_repo cli-bin):$tag")
 
   # create the cli-bin container in order to extract the binaries
