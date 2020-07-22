@@ -23,12 +23,20 @@ export DOCKER_BUILDKIT_CACHE=${DOCKER_BUILDKIT_CACHE:-}
 # When set together with DOCKER_BUILDKIT, it will build and push the multi architecture images to the registry.
 export DOCKER_MULTIARCH=${DOCKER_MULTIARCH:-}
 
+# Default supported docker image architectures
+export SUPPORTED_ARCHS=linux/amd64,linux/arm64,linux/arm/v7
+
 docker_repo() {
     repo=$1
 
     name=$repo
     if [ -n "${DOCKER_REGISTRY:-}" ]; then
         name="$DOCKER_REGISTRY/$name"
+    fi
+
+    if [ "$repo" == "go-deps" ] || [ "$repo" == "base" ]; then
+        echo "gcr.io/linkerd-io/$repo"
+        exit 0
     fi
 
     echo "$name"
@@ -59,7 +67,7 @@ docker_build() {
 
         output_params="--load"
         if [ -n "$DOCKER_MULTIARCH" ]; then
-            output_params="--push"
+            output_params="--platform $SUPPORTED_ARCHS --push"
         fi
 
         log_debug "  :; docker buildx $rootdir $cache_params $output_params -t $repo:$tag -f $file $*"
