@@ -47,7 +47,6 @@ jobs:
       env:
         DOCKER_TRACE: 1
         BUILD_DEBUG: 1
-        DOCKER_REGISTRY: docker.io/etni35
         DOCKER_MULTIARCH: 1
       run: bin/docker-build-${{ matrix.target }}
     - name: Prune docker layers cache
