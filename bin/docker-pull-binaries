@@ -21,19 +21,31 @@ mkdir -p "$workdir"
 # create shorttag where eventual initial v in tag is stripped
 shorttag=${tag#v}
 
-# create the cli-bin container in order to extract the binaries
-id=$(docker create "$(docker_repo cli-bin):$tag")
+copy_binary() {
+  id=$1
+  os=$2
+  ext=$3
 
-for os in darwin linux windows ; do
-  ext=$os
-  if [ "$os" = windows ]; then
-    ext=windows.exe
-  fi
   filepath=$workdir/linkerd2-cli-$shorttag-$ext
   docker cp "$id:/out/linkerd-$os" "$filepath"
   openssl dgst -sha256 "$filepath" | awk '{print $2}' > "$filepath.sha256"
   echo "$filepath"
-done
+}
+
+# create the cli-bin container in order to extract the binaries
+id=$(docker create "$(docker_repo cli-bin):$tag")
+
+# copy mac and windows binaries
+copy_binary $id "darwin" "darwin"
+copy_binary $id "windows" "windows.exe"
 
 # cleanup the cli-bin container when finished
 docker rm "$id" > /dev/null
+
+# copy linux binaries with different architecture
+for arch in amd64 arm64 arm ; do
+  pull=$(docker pull --platform $arch "$(docker_repo cli-bin):$tag")
+  id=$(docker create "$(docker_repo cli-bin):$tag")
+  copy_binary $id "linux" "linux-$arch"
+  docker rm "$id" > /dev/null
+done
