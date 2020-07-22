@@ -4,7 +4,8 @@ WORKDIR /linkerd-build
 COPY pkg pkg
 COPY controller controller
 COPY cni-plugin cni-plugin
-RUN CGO_ENABLED=0 GOOS=linux go build -o /go/bin/linkerd-cni -v -mod=readonly ./cni-plugin/
+ARG TARGETARCH
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=$TARGETARCH go build -o /go/bin/linkerd-cni -v -mod=readonly ./cni-plugin/
 
 FROM gcr.io/linkerd-io/base:2020-06-08.01
 WORKDIR /linkerd

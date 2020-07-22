@@ -28,8 +28,8 @@ COPY web/main.go web
 COPY web/srv web/srv
 COPY controller controller
 COPY pkg pkg
-
-RUN CGO_ENABLED=0 GOOS=linux go build -mod=readonly -o web/web -ldflags "-s -w" ./web
+ARG TARGETARCH
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=$TARGETARCH go build -mod=readonly -o web/web -ldflags "-s -w" ./web
 
 ## package it all up
 FROM debian:buster-20200514-slim
