@@ -32,20 +32,21 @@ copy_binary() {
   echo "$filepath"
 }
 
-# create the cli-bin container in order to extract the binaries
-id=$(docker create "$(docker_repo cli-bin):$tag")
-
-# copy mac and windows binaries
-copy_binary $id "darwin" "darwin"
-copy_binary $id "windows" "windows.exe"
-
-# cleanup the cli-bin container when finished
-docker rm "$id" > /dev/null
-
-# copy linux binaries with different architecture
 for arch in amd64 arm64 arm ; do
   pull=$(docker pull --platform $arch "$(docker_repo cli-bin):$tag")
+
+  # create the cli-bin container in order to extract the binaries
   id=$(docker create "$(docker_repo cli-bin):$tag")
+
+  if [ "$arch" = amd64 ]; then
+    # copy mac and windows binaries
+    copy_binary $id "darwin" "darwin"
+    copy_binary $id "windows" "windows.exe"
+  fi
+
+  # copy linux binaries with architecture name
   copy_binary $id "linux" "linux-$arch"
+
+  # cleanup the cli-bin container when finished
   docker rm "$id" > /dev/null
 done
