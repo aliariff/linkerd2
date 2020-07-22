@@ -20,6 +20,9 @@ export DOCKER_BUILDKIT=${DOCKER_BUILDKIT:-}
 # buildx cache directory. Needed if DOCKER_BUILDKIT is used
 export DOCKER_BUILDKIT_CACHE=${DOCKER_BUILDKIT_CACHE:-}
 
+# When set together with DOCKER_BUILDKIT, it will build and push the multi architecture images to the registry.
+export DOCKER_MULTIARCH=${DOCKER_MULTIARCH:-}
+
 docker_repo() {
     repo=$1
 
@@ -49,25 +52,31 @@ docker_build() {
     rootdir=$( cd "$bindir"/.. && pwd )
 
     if [ -n "$DOCKER_BUILDKIT" ]; then
-      cache_params=""
-      if [ -n "$DOCKER_BUILDKIT_CACHE" ]; then
-        cache_params="--cache-from type=local,src=${DOCKER_BUILDKIT_CACHE} --cache-to type=local,dest=${DOCKER_BUILDKIT_CACHE},mode=max"
-      fi
-      log_debug "  :; docker buildx $rootdir $cache_params --load -t $repo:$tag -f $file $*"
-      # shellcheck disable=SC2086
-      docker buildx build "$rootdir" $cache_params \
-          --load \
-          -t "$repo:$tag" \
-          -f "$file" \
-          "$@" \
-          > "$output"
+        cache_params=""
+        if [ -n "$DOCKER_BUILDKIT_CACHE" ]; then
+            cache_params="--cache-from type=local,src=${DOCKER_BUILDKIT_CACHE} --cache-to type=local,dest=${DOCKER_BUILDKIT_CACHE},mode=max"
+        fi
+
+        output_params="--load"
+        if [ -n "$DOCKER_MULTIARCH" ]; then
+            output_params="--push"
+        fi
+
+        log_debug "  :; docker buildx $rootdir $cache_params $output_params -t $repo:$tag -f $file $*"
+        # shellcheck disable=SC2086
+        docker buildx build "$rootdir" "$cache_params" \
+            "$output_params" \
+            -t "$repo:$tag" \
+            -f "$file" \
+            "$@" \
+            > "$output"
     else
-      log_debug "  :; docker build $rootdir -t $repo:$tag -f $file $*"
-      docker build "$rootdir" \
-          -t "$repo:$tag" \
-          -f "$file" \
-          "$@" \
-          > "$output"
+        log_debug "  :; docker build $rootdir -t $repo:$tag -f $file $*"
+        docker build "$rootdir" \
+            -t "$repo:$tag" \
+            -f "$file" \
+            "$@" \
+            > "$output"
     fi
 
     echo "$repo:$tag"
