@@ -24,7 +24,7 @@ export DOCKER_BUILDKIT_CACHE=${DOCKER_BUILDKIT_CACHE:-}
 export DOCKER_MULTIARCH=${DOCKER_MULTIARCH:-}
 
 # Default supported docker image architectures
-export SUPPORTED_ARCHS=linux/amd64,linux/arm64,linux/arm/v7
+export SUPPORTED_ARCHS=linux/amd64
 
 docker_repo() {
     repo=$1
