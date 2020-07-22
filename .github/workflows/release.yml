@@ -126,7 +126,6 @@ jobs:
         echo "::set-env name=TAG::$TAG"
     - name: Run integration tests
       run: |
-        TAG="$(CI_FORCE_CLEAN=1 bin/root-tag)"
         bin/docker-pull-binaries $TAG
         # Validate the CLI version matches the current build tag.
         [[ "$TAG" == "$($CMD version --short --client)" ]]
