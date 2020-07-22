@@ -123,7 +123,7 @@ jobs:
         TAG="$(CI_FORCE_CLEAN=1 bin/root-tag)"
         CMD="$PWD/target/release/linkerd2-cli-$TAG-linux"
         echo "::set-env name=CMD::$CMD"
-        echo "::set-output name=tag::$TAG"
+        echo "::set-env name=TAG::$TAG"
     - name: Run integration tests
       run: |
         TAG="$(CI_FORCE_CLEAN=1 bin/root-tag)"
