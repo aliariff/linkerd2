@@ -17,8 +17,11 @@ export DOCKER_TRACE=${DOCKER_TRACE:-}
 # When set, use `docker buildx` and use the github actions cache to store/retrieve images
 export DOCKER_BUILDKIT=${DOCKER_BUILDKIT:-}
 
-# buildx cache directory. Needed if DOCKER_BUILDKIT is used
-export DOCKER_BUILDKIT_CACHE=${DOCKER_BUILDKIT_CACHE:-}
+# buildx local cache directory. Needed if DOCKER_BUILDKIT is used
+export DOCKER_BUILDKIT_CACHE_LOCAL=${DOCKER_BUILDKIT_CACHE_LOCAL:-}
+
+# buildx external cache registry. Needed if DOCKER_BUILDKIT is used
+export DOCKER_BUILDKIT_CACHE_REGISTRY=${DOCKER_BUILDKIT_CACHE_REGISTRY:-}
 
 # When set together with DOCKER_BUILDKIT, it will build the multi-arch images. Currently DOCKER_PUSH is also required
 export DOCKER_MULTIARCH=${DOCKER_MULTIARCH:-}
@@ -42,6 +45,9 @@ docker_repo() {
 
 docker_build() {
     repo=$(docker_repo "$1")
+    if [ -n "$DOCKER_BUILDKIT_CACHE_REGISTRY" ]; then
+      cache_repo="$DOCKER_BUILDKIT_CACHE_REGISTRY/$1"
+    fi
     shift
 
     tag=$1
@@ -59,8 +65,11 @@ docker_build() {
 
     if [ -n "$DOCKER_BUILDKIT" ]; then
       cache_params=""
-      if [ -n "$DOCKER_BUILDKIT_CACHE" ]; then
-        cache_params="--cache-from type=local,src=${DOCKER_BUILDKIT_CACHE} --cache-to type=local,dest=${DOCKER_BUILDKIT_CACHE},mode=max"
+      if [ -n "$DOCKER_BUILDKIT_CACHE_LOCAL" ]; then
+        cache_params="--cache-from type=local,src=${DOCKER_BUILDKIT_CACHE_LOCAL} --cache-to type=local,dest=${DOCKER_BUILDKIT_CACHE_LOCAL},mode=max"
+      elif [ -n "$DOCKER_BUILDKIT_CACHE_REGISTRY" ]; then
+        cache_tag="$cache_repo:cache"
+        cache_params="--cache-from type=registry,ref=$cache_tag --cache-to type=registry,ref=$cache_tag,mode=max"
       fi
 
       output_params="--load"

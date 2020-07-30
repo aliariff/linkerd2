@@ -27,12 +27,12 @@ jobs:
 
         . bin/_docker.sh
         echo ::set-env name=DOCKER_REGISTRY::$DOCKER_REGISTRY
-        echo ::set-env name=DOCKER_BUILDKIT_CACHE::${{ runner.temp }}/.buildx-cache
+        echo ::set-env name=DOCKER_BUILDKIT_CACHE_LOCAL::${{ runner.temp }}/.buildx-cache
     - name: Cache docker layers
       # actions/cache@v2.0.0
       uses: actions/cache@b820478
       with:
-        path: ${{ env.DOCKER_BUILDKIT_CACHE }}
+        path: ${{ env.DOCKER_BUILDKIT_CACHE_LOCAL }}
         key: ${{ runner.os }}-buildx-${{ matrix.target }}-${{ env.TAG }}
         restore-keys: |
           ${{ runner.os }}-buildx-${{ matrix.target }}-
