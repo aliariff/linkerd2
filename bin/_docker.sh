@@ -69,7 +69,7 @@ docker_build() {
         cache_params="--cache-from type=local,src=${DOCKER_BUILDKIT_CACHE_LOCAL} --cache-to type=local,dest=${DOCKER_BUILDKIT_CACHE_LOCAL},mode=max"
       elif [ -n "$DOCKER_BUILDKIT_CACHE_REGISTRY" ]; then
         cache_tag="$cache_repo:cache"
-        cache_params="--cache-from type=registry,ref=$cache_tag --cache-to type=registry,ref=$cache_tag,mode=max"
+        cache_params="--cache-from type=registry,ref=$cache_tag --cache-to type=registry,ref=$cache_tag"
       fi
 
       output_params="--load"
