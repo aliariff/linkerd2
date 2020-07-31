@@ -39,6 +39,4 @@ jobs:
         DOCKER_TRACE: 1
         DOCKER_MULTIARCH: 1
         DOCKER_PUSH: 1
-      run: |
-        # docker buildx create --driver docker-container --use
-        bin/docker-build-${{ matrix.target }}
+      run: bin/docker-build-${{ matrix.target }}
