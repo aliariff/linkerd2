@@ -1,16 +1,14 @@
 ARG BUILDPLATFORM=linux/amd64
 
-# Precompile key slow-to-build dependencies
-FROM --platform=$BUILDPLATFORM golang:1.14.2-alpine as go-deps
-ONBUILD WORKDIR /linkerd-build
-ONBUILD COPY go.mod go.sum ./
-ONBUILD COPY bin/install-deps bin/
-ONBUILD RUN go mod download
-ONBUILD ARG TARGETARCH
-ONBUILD RUN ./bin/install-deps $TARGETARCH
-
 ## compile controller service
-FROM go-deps as golang
+FROM --platform=$BUILDPLATFORM golang:1.14.2-alpine as golang
+WORKDIR /linkerd-build
+COPY go.mod go.sum ./
+COPY bin/install-deps bin/
+RUN go mod download
+ARG TARGETARCH
+RUN ./bin/install-deps $TARGETARCH
+
 COPY controller/gen controller/gen
 COPY pkg pkg
 COPY controller controller
