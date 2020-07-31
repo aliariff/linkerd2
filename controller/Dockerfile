@@ -2,16 +2,15 @@ ARG BUILDPLATFORM=linux/amd64
 
 # Precompile key slow-to-build dependencies
 FROM --platform=$BUILDPLATFORM golang:1.14.2-alpine as go-deps
-WORKDIR /linkerd-build
-COPY go.mod go.sum ./
-COPY bin/install-deps bin/
+ONBUILD WORKDIR /linkerd-build
+ONBUILD COPY go.mod go.sum ./
+ONBUILD COPY bin/install-deps bin/
 ONBUILD RUN go mod download
-ARG TARGETARCH
+ONBUILD ARG TARGETARCH
 ONBUILD RUN ./bin/install-deps $TARGETARCH
 
 ## compile controller service
 FROM go-deps as golang
-WORKDIR /linkerd-build
 COPY controller/gen controller/gen
 COPY pkg pkg
 COPY controller controller
@@ -21,7 +20,6 @@ COPY charts/partials charts/partials
 # Generate static templates
 # TODO: `go generate` does not honor -mod=readonly
 RUN go generate -mod=readonly ./pkg/charts/static
-ARG TARGETARCH
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=$TARGETARCH go build -o /out/controller -tags prod -mod=readonly -ldflags "-s -w" ./controller/cmd
 
 ## package runtime
