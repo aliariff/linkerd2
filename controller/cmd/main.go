@@ -18,7 +18,7 @@ import (
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Println("expected a subcommand")
-		fmt.Println("test-11")
+		fmt.Println("test-12")
 		os.Exit(1)
 	}
 
