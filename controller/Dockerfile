@@ -5,8 +5,8 @@ FROM --platform=$BUILDPLATFORM golang:1.14.2-alpine as go-deps
 ARG TARGETARCH
 WORKDIR /linkerd-build
 COPY go.mod go.sum ./
-COPY bin/install-deps bin/
 RUN go mod download
+COPY bin/install-deps bin/
 RUN ./bin/install-deps $TARGETARCH
 
 ## compile controller service
