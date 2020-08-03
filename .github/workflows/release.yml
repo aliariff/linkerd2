@@ -6,7 +6,7 @@ name: Release
 on:
   push:
     branches:
-    - test-cache
+    - test-local-cache
 env:
   GH_ANNOTATION: true
   DOCKER_BUILDKIT: 1
