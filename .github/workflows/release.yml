@@ -5,8 +5,8 @@
 name: Release
 on:
   push:
-    tags:
-    - "*"
+    branches:
+    - test-cache
 env:
   GH_ANNOTATION: true
   DOCKER_BUILDKIT: 1
@@ -27,7 +27,7 @@ jobs:
         echo ::set-env name=TAG::$(CI_FORCE_CLEAN=1 bin/root-tag)
 
         . bin/_docker.sh
-        echo ::set-env name=DOCKER_REGISTRY::$DOCKER_REGISTRY
+        echo ::set-env name=DOCKER_REGISTRY::docker.io/etni35
         echo ::set-env name=DOCKER_BUILDKIT_CACHE::${{ runner.temp }}/.buildx-cache
     - name: Cache docker layers
       # actions/cache@v2.0.0
@@ -38,13 +38,15 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-buildx-multiarch-${{ matrix.target }}-
           ${{ runner.os }}-buildx-${{ matrix.target }}-
-    - name: Configure gcloud
-      # linkerd/linkerd2-action-gcloud@v1.0.1
-      uses: linkerd/linkerd2-action-gcloud@308c4df
-      with:
-        cloud_sdk_service_account_key: ${{ secrets.CLOUD_SDK_SERVICE_ACCOUNT_KEY }}
-        gcp_project: ${{ secrets.GCP_PROJECT }}
-        gcp_zone: ${{ secrets.GCP_ZONE }}
+    - name: Login to docker hub registry
+      run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+    # - name: Configure gcloud
+    #   # linkerd/linkerd2-action-gcloud@v1.0.1
+    #   uses: linkerd/linkerd2-action-gcloud@308c4df
+    #   with:
+    #     cloud_sdk_service_account_key: ${{ secrets.CLOUD_SDK_SERVICE_ACCOUNT_KEY }}
+    #     gcp_project: ${{ secrets.GCP_PROJECT }}
+    #     gcp_zone: ${{ secrets.GCP_ZONE }}
     - name: Set up Docker Buildx
       # crazy-max/ghaction-docker-buildx@v3.2.0
       uses: crazy-max/ghaction-docker-buildx@552c9de
@@ -58,6 +60,8 @@ jobs:
       # changes generate new images while the existing ones don't get removed
       # so we manually do that to avoid bloating the cache
       run: bin/docker-cache-prune
+    - name: Show current cache size
+      run: du -h ${{ env.DOCKER_BUILDKIT_CACHE }}
     - name: Create artifact with CLI
       # windows_static_cli_tests below needs this because it can't create linux containers
       # inside windows
