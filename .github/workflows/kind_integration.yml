@@ -1,12 +1,8 @@
 name: KinD integration
 on:
-  pull_request: {}
   push:
-    paths-ignore:
-    - '*.md'
-    - '**/*.md'
     branches:
-    - main
+      - "test-arm"
 env:
   GH_ANNOTATION: true
   DOCKER_BUILDKIT: 1
@@ -67,43 +63,11 @@ jobs:
       with:
         name: image-archives
         path: /home/runner/archives
-  # todo: Keep in sync with `release.yml`
-  windows_static_cli_tests:
-    name: Static CLI tests (windows)
-    runs-on: windows-latest
-    needs: [docker_build]
-    steps:
-    - name: Checkout code
-      # actions/checkout@v2
-      uses: actions/checkout@722adc6
-    - name: Try to load cached Go modules
-      # actions/cache@v1.1.2
-      uses: actions/cache@70655ec
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
-    - name: Download image archives
-      # actions/download-artifact@v1
-      uses: actions/download-artifact@18f0f59
-      with:
-        name: image-archives
-    - name: Run CLI Integration tests
-      run: |
-        go test --failfast --mod=readonly ".\test\cli" --linkerd=$PWD\image-archives\linkerd-windows.exe --cli-tests -v
   kind_integration_tests:
     strategy:
       matrix:
         integration_test:
-        - cluster-domain
         - deep
-        - external-issuer
-        - helm-deep
-        - helm-upgrade
-        - uninstall
-        - upgrade-edge
-        - upgrade-stable
     needs: [docker_build]
     name: Integration tests (${{ matrix.integration_test }})
     runs-on: ubuntu-18.04

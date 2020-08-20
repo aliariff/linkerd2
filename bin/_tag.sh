@@ -17,12 +17,13 @@ named_tag() {
 }
 
 head_root_tag() {
-    if clean_head ; then
-        clean_head_root_tag
-    else
-        name=${USER//[^[:alnum:].-]/}
-        echo "dev-$(git_sha_head)-$name"
-    fi
+    echo "edge-20.8.1"
+    # if clean_head ; then
+    #     clean_head_root_tag
+    # else
+    #     name=${USER//[^[:alnum:].-]/}
+    #     echo "dev-$(git_sha_head)-$name"
+    # fi
 }
 
 clean_head_root_tag() {

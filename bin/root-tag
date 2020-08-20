@@ -5,4 +5,5 @@ bindir=$( cd "${0%/*}" && pwd )
 # shellcheck source=_tag.sh
 . "$bindir"/_tag.sh
 
-head_root_tag
+echo "edge-20.8.1"
+# head_root_tag
