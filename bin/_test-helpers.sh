@@ -6,7 +6,7 @@ set +e
 
 ##### Test setup helpers #####
 
-export default_test_names=(deep)
+export default_test_names=(deep external-issuer helm-deep helm-upgrade uninstall upgrade-edge upgrade-stable)
 export all_test_names=(cluster-domain "${default_test_names[*]}")
 
 handle_input() {
@@ -344,7 +344,10 @@ run_uninstall_test() {
 run_deep_test() {
   local tests=()
   run_test "$test_directory/install_test.go" --multicluster
-  run_test "$test_directory/tracing"
+  while IFS= read -r line; do tests+=("$line"); done <<< "$(go list "$test_directory"/.../...)"
+  for test in "${tests[@]}"; do
+    run_test "$test"
+  done
 }
 
 run_helm-deep_test() {
